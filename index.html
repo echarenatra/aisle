@@ -217,6 +217,20 @@
 
     <script type="module" src="/src/main.js"></script>
 
+    <div id="clear-plan-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] flex items-center justify-center hidden p-4">
+      <div class="bg-white rounded-2xl max-w-sm w-full p-8 shadow-2xl text-center">
+        <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+        </div>
+        <h3 class="text-xl font-black mb-2 text-gray-900">Clear All Plans?</h3>
+        <p class="text-gray-500 text-sm mb-8">This will remove all planned meals for both weeks. Your recipes stay in the vault.</p>
+        <div class="flex gap-3">
+          <button onclick="closeClearPlanModal()" class="flex-1 py-3 bg-gray-100 text-gray-900 font-bold rounded-xl transition hover:bg-gray-200">Cancel</button>
+          <button id="confirm-clear-plan" class="flex-1 py-3 bg-red-600 text-white font-bold rounded-xl transition hover:bg-red-700 shadow-lg shadow-red-200">Clear All</button>
+        </div>
+      </div>
+    </div>
+
     <div id="delete-confirm-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] flex items-center justify-center hidden p-4">
       <div class="bg-white rounded-2xl max-w-sm w-full p-8 shadow-2xl text-center">
         <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
