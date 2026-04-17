@@ -37,9 +37,10 @@ async function loadRecipes() {
     // Apply the 3-way filter
     const filteredRecipes = recipes.filter(recipe => {
       const matchesSearch = (recipe.title || '').toLowerCase().includes(searchTerm);
-      const matchesProtein = selectedProtein === 'all' || (recipe.tags?.protein?.toLowerCase() === selectedProtein);
-      const matchesCuisine = selectedCuisine === 'all' || (recipe.tags?.cuisine?.toLowerCase() === selectedCuisine);
-      const matchesType = selectedDishType === 'all' || (recipe.tags?.dish_type?.toLowerCase() === selectedDishType);
+      const matchesProtein = selectedProtein === 'all' || (String(recipe.tags?.protein ?? '').toLowerCase() === selectedProtein);
+      const matchesCuisine = selectedCuisine === 'all' || (String(recipe.tags?.cuisine ?? '').toLowerCase() === selectedCuisine);
+      const dishTypes = Array.isArray(recipe.tags?.dish_type) ? recipe.tags.dish_type : [recipe.tags?.dish_type ?? ''];
+      const matchesType = selectedDishType === 'all' || dishTypes.map(t => t.toLowerCase()).includes(selectedDishType);
 
       return matchesSearch && matchesProtein && matchesCuisine && matchesType;
     });
@@ -71,7 +72,10 @@ function updateFilterDropdowns(recipes) {
   recipes.forEach(r => {
     if (r.tags?.protein) proteins.add(r.tags.protein.toLowerCase().trim());
     if (r.tags?.cuisine) cuisines.add(r.tags.cuisine.toLowerCase().trim());
-    if (r.tags?.dish_type) dishTypes.add(r.tags.dish_type.toLowerCase().trim());
+    if (r.tags?.dish_type) {
+      const types = Array.isArray(r.tags.dish_type) ? r.tags.dish_type : [r.tags.dish_type];
+      types.forEach(t => dishTypes.add(t.toLowerCase().trim()));
+    }
   });
 
   // Re-build Protein Dropdown
@@ -113,7 +117,7 @@ function renderVaultGrid(recipes) {
         <div class="flex items-center gap-2 mb-4">
           <p class="text-[10px] font-bold text-gray-400 uppercase">${recipe.prep_time_minutes}m Prep</p>
           ${recipe.tags?.protein ? `<span class="w-1 h-1 bg-gray-300 rounded-full"></span><span class="text-[10px] font-bold text-blue-500 uppercase">${recipe.tags.protein}</span>` : ''}
-          ${recipe.tags?.dish_type ? `<span class="w-1 h-1 bg-gray-300 rounded-full"></span><span class="text-[10px] font-bold text-green-600 uppercase">${recipe.tags.dish_type}</span>` : ''}
+          ${recipe.tags?.dish_type ? `<span class="w-1 h-1 bg-gray-300 rounded-full"></span><span class="text-[10px] font-bold text-green-600 uppercase">${[].concat(recipe.tags.dish_type).join(', ')}</span>` : ''}
         </div>
         <button onclick="addToPlan('${recipe.id}')" class="w-full py-2.5 bg-gray-50 hover:bg-black hover:text-white text-gray-900 text-xs font-black uppercase tracking-widest rounded-xl transition">Add to Plan</button>
       </div>
@@ -139,13 +143,13 @@ window.viewRecipe = async (id) => {
     <div class="flex flex-wrap gap-2 mb-6">
       ${recipe.tags?.protein ? `<span class="px-2 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase rounded-md border border-blue-100">${recipe.tags.protein}</span>` : ''}
       ${recipe.tags?.cuisine ? `<span class="px-2 py-1 bg-orange-50 text-orange-600 text-[10px] font-black uppercase rounded-md border border-orange-100">${recipe.tags.cuisine}</span>` : ''}
-      ${recipe.tags?.dish_type ? `<span class="px-2 py-1 bg-green-50 text-green-600 text-[10px] font-black uppercase rounded-md border border-green-100">${recipe.tags.dish_type}</span>` : ''}
+      ${recipe.tags?.dish_type ? [].concat(recipe.tags.dish_type).map(t => `<span class="px-2 py-1 bg-green-50 text-green-600 text-[10px] font-black uppercase rounded-md border border-green-100">${t}</span>`).join('') : ''}
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
       <div>
         <h4 class="font-black uppercase tracking-widest text-blue-500 text-xs mb-4">Ingredients</h4>
         <ul class="space-y-2">
-          ${ingredients.map(ing => `<li class="text-sm font-medium border-b border-gray-50 pb-2 flex justify-between"><span>${ing.item_name}</span><span class="text-gray-400">${decimalToFraction(ing.quantity)} ${ing.unit}</span></li>`).join('')}
+          ${ingredients.map(ing => `<li class="text-sm border-b border-gray-50 py-2.5 grid grid-cols-[1fr_auto] gap-x-4"><span class="font-medium text-gray-800">${ing.item_name}</span><span class="text-gray-400 font-medium whitespace-nowrap text-right">${decimalToFraction(ing.quantity)}${ing.unit ? ' ' + ing.unit : ''}</span></li>`).join('')}
         </ul>
       </div>
       <div>
@@ -274,7 +278,7 @@ window.generateShoppingList = async () => {
   const { data: ingredients } = await supabase.from('aisle_recipe_ingredients').select('*').in('recipe_id', plans.map(p => p.recipe_id));
 
   const totals = ingredients.reduce((acc, ing) => {
-    const key = `${ing.item_name.toLowerCase().trim()}-${ing.unit.toLowerCase().trim()}`;
+    const key = `${ing.item_name.toLowerCase().trim()}-${(ing.unit ?? '').toLowerCase().trim()}`;
     if (!acc[key]) acc[key] = { ...ing, quantity: 0 };
     acc[key].quantity += Number(ing.quantity);
     return acc;
@@ -290,7 +294,7 @@ window.generateShoppingList = async () => {
     <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
       <h3 class="text-sm font-black uppercase tracking-widest text-blue-500 mb-4">${cat}</h3>
       <ul class="space-y-3">
-        ${grouped[cat].map(ing => `<li class="flex items-center gap-3 group cursor-pointer" onclick="this.classList.toggle('opacity-30')"><div class="w-5 h-5 border-2 border-gray-200 rounded-md transition"></div><span class="text-gray-700 font-medium">${decimalToFraction(ing.quantity)} ${ing.unit} <span class="font-bold text-gray-900">${ing.item_name}</span></span></li>`).join('')}
+        ${grouped[cat].map(ing => `<li class="flex items-center gap-3 group cursor-pointer" onclick="this.classList.toggle('opacity-30')"><div class="w-5 h-5 border-2 border-gray-200 rounded-md transition"></div><span class="text-gray-700 font-medium">${decimalToFraction(ing.quantity)}${ing.unit ? ' ' + ing.unit : ''} <span class="font-bold text-gray-900">${ing.item_name}</span></span></li>`).join('')}
       </ul>
     </div>
   `).join('');

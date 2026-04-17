@@ -74,7 +74,7 @@
               - cuisine tag: identify the cuisine that best matches the recipe's ingredients, flavor profile, and cooking style (e.g. asian, italian, mexican, mediterranean, american, indian, french, japanese, chinese, middle eastern). These are examples — use your best judgment to pick the most accurate single-word cuisine label, even if it is not in this list.
               - dish_type tag: an array of one or more values from this fixed list that best describe all the ways this dish can reasonably be served: main, side, veggie, soup, snack, dessert. Only use values from this list.
               - quantity must be a decimal number (e.g. 0.5, 1, 2.5) — never a fraction string.
-              - unit must be null for whole/countable items with no meaningful unit (e.g. 2 garlic cloves, 2 chicken breasts).
+              - unit must be "pcs" for whole/countable items with no meaningful unit (e.g. 2 garlic cloves → unit "pcs", 2 chicken breasts → unit "pcs", 3 eggs → unit "pcs").
               - category for each ingredient must be one of: protein, produce, dairy, pantry, grains, spices, other.
               - If source_url or image_url are unknown, use an empty string "".
               
