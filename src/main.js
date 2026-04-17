@@ -339,6 +339,7 @@ window.addEventListener('click', (e) => {
 
 // Start the app
 loadRecipes();
+changeWeek('current');
 loadWeeklyPlan();
 
 dishTypeFilter?.addEventListener('change', loadRecipes);

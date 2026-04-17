@@ -47,38 +47,39 @@
             </div>
             <pre id="ai-prompt-text" class="text-xs text-gray-700 bg-white px-4 py-3 overflow-x-auto leading-relaxed whitespace-pre-wrap">Convert the following recipe into this exact JSON format. Return only the raw JSON — no markdown, no explanation, no code block.
 
-{
-  "title": "Recipe Name",
-  "tags": {
-    "protein": "chicken",
-    "cuisine": "asian",
-    "dish_type": "main"
-  },
-  "source_url": "",
-  "image_url": "",
-  "prep_time_minutes": 15,
-  "cook_time_minutes": 30,
-  "servings": 4,
-  "instructions": [
-    "Step 1...",
-    "Step 2..."
-  ],
-  "ingredients": [
-    { "item_name": "chicken breast", "quantity": 0.5, "unit": "kg", "category": "protein" },
-    { "item_name": "olive oil", "quantity": 2, "unit": "tbsp", "category": "pantry" }
-  ]
-}
-
-Rules:
-- protein tag options: chicken, beef, pork, seafood, lamb, tofu, eggs, legumes, none
-- cuisine tag options: asian, italian, mexican, mediterranean, american, indian, other
-- dish_type tag options: main, side, salad, soup, snack, breakfast, dessert
-- quantity must be a decimal number (e.g. 0.5, 1, 2.5) — never a fraction string
-- category for each ingredient: protein, produce, dairy, pantry, grains, spices, other
-- If source_url or image_url are unknown, use an empty string ""
-
-Recipe to convert:
-[PASTE YOUR RECIPE HERE]</pre>
+              {
+                "title": "Recipe Name",
+                "tags": {
+                  "protein": "chicken",
+                  "cuisine": "asian",
+                  "dish_type": ["main", "side"]
+                },
+                "source_url": "",
+                "image_url": "",
+                "prep_time_minutes": 15,
+                "cook_time_minutes": 30,
+                "servings": 4,
+                "instructions": [
+                  "Step 1...",
+                  "Step 2..."
+                ],
+                "ingredients": [
+                  { "item_name": "chicken breast", "quantity": 0.5, "unit": "kg", "category": "protein" },
+                  { "item_name": "olive oil", "quantity": 2, "unit": "tbsp", "category": "pantry" }
+                ]
+              }
+              
+              Rules:
+              - protein tag: identify the primary protein in the recipe (e.g. chicken, beef, pork, seafood, lamb, tofu, eggs, legumes). Use "none" if there is no primary protein. These are examples — use whatever single word best describes the protein.
+              - cuisine tag: identify the cuisine that best matches the recipe's ingredients, flavor profile, and cooking style (e.g. asian, italian, mexican, mediterranean, american, indian, french, japanese, chinese, middle eastern). These are examples — use your best judgment to pick the most accurate single-word cuisine label, even if it is not in this list.
+              - dish_type tag: an array of one or more values from this fixed list that best describe all the ways this dish can reasonably be served: main, side, veggie, soup, snack, dessert. Only use values from this list.
+              - quantity must be a decimal number (e.g. 0.5, 1, 2.5) — never a fraction string.
+              - unit must be null for whole/countable items with no meaningful unit (e.g. 2 garlic cloves, 2 chicken breasts).
+              - category for each ingredient must be one of: protein, produce, dairy, pantry, grains, spices, other.
+              - If source_url or image_url are unknown, use an empty string "".
+              
+              Recipe to convert:
+              [PASTE RECIPE URL OR TEXT HERE]</pre>
           </div>
         </div>
 
