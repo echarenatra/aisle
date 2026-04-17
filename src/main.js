@@ -36,11 +36,11 @@ async function loadRecipes() {
 
     // Apply the 3-way filter
     const filteredRecipes = recipes.filter(recipe => {
-      const matchesSearch = recipe.title.toLowerCase().includes(searchTerm);
-      const matchesProtein = selectedProtein === 'all' || (recipe.tags?.protein === selectedProtein);
-      const matchesCuisine = selectedCuisine === 'all' || (recipe.tags?.cuisine === selectedCuisine);
-      const matchesType = selectedDishType === 'all' || (recipe.tags?.dish_type === selectedDishType);
-      
+      const matchesSearch = (recipe.title || '').toLowerCase().includes(searchTerm);
+      const matchesProtein = selectedProtein === 'all' || (recipe.tags?.protein?.toLowerCase() === selectedProtein);
+      const matchesCuisine = selectedCuisine === 'all' || (recipe.tags?.cuisine?.toLowerCase() === selectedCuisine);
+      const matchesType = selectedDishType === 'all' || (recipe.tags?.dish_type?.toLowerCase() === selectedDishType);
+
       return matchesSearch && matchesProtein && matchesCuisine && matchesType;
     });
 
@@ -48,6 +48,7 @@ async function loadRecipes() {
 
   } catch (error) {
     console.error('Error loading recipes:', error.message);
+    if (vaultGrid) vaultGrid.innerHTML = `<p class="text-red-400 col-span-full text-center py-10">Error loading recipes: ${error.message}</p>`;
   }
 }
 
@@ -321,7 +322,7 @@ async function saveRecipeToDatabase() {
 
     statusMessage.textContent = '✅ Saved!';
     jsonInput.value = '';
-    loadRecipes();
+    await loadRecipes();
   } catch (err) { statusMessage.textContent = `❌ ${err.message}`; }
 }
 
